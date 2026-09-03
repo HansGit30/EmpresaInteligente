@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Headphones, 
-  Brain, 
-  Calculator, 
-  FileText, 
+import {
+  LayoutDashboard,
+  Users,
+  Headphones,
+  Brain,
+  Calculator,
+  FileText,
   Settings,
-  ChevronDown, 
+  ChevronDown,
   ChevronRight,
   Search,
   Bell,
@@ -32,7 +32,24 @@ export const MainLayout: React.FC = () => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const isActive = (path: string) => location.pathname === path;
+  // Evalúa la ruta y los parámetros query para determinar si el enlace está activo
+  const isActive = (path: string) => {
+    const currentFullPath = `${location.pathname}${location.search}`;
+
+    if (path.includes('?')) {
+      return currentFullPath === path;
+    }
+
+    if (path === '/clientes') {
+      return location.pathname === '/clientes' && (!location.search || location.search === '?tab=lista');
+    }
+
+    if (path === '/nlp') {
+      return location.pathname === '/nlp' && (!location.search || location.search === '?tab=analizar');
+    }
+
+    return location.pathname === path;
+  };
 
   return (
     <div style={containerStyle}>
@@ -60,7 +77,7 @@ export const MainLayout: React.FC = () => {
 
           {/* CLIENTES */}
           <div>
-            <div style={parentItemStyle(false)} onClick={() => toggleSection('clientes')}>
+            <div style={parentItemStyle(location.pathname.startsWith('/clientes'))} onClick={() => toggleSection('clientes')}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Users size={18} />
                 <span>Clientes</span>
@@ -69,18 +86,22 @@ export const MainLayout: React.FC = () => {
             </div>
             {openSections.clientes && (
               <div style={subMenuContainerStyle}>
-                <Link to="/clientes" style={subItemStyle(isActive('/clientes'))}>
+                <Link to="/clientes?tab=lista" style={subItemStyle(isActive('/clientes'))}>
                   Lista de clientes
                 </Link>
-                <span style={subItemStyle(false)}>Nuevo cliente</span>
-                <span style={subItemStyle(false)}>Historial</span>
+                <Link to="/clientes?tab=nuevo" style={subItemStyle(isActive('/clientes?tab=nuevo'))}>
+                  Nuevo cliente
+                </Link>
+                <Link to="/clientes?tab=historial" style={subItemStyle(isActive('/clientes?tab=historial'))}>
+                  Historial
+                </Link>
               </div>
             )}
           </div>
 
           {/* ATENCIÓN */}
           <div>
-            <div style={parentItemStyle(false)} onClick={() => toggleSection('atencion')}>
+            <div style={parentItemStyle(location.pathname.startsWith('/comentarios'))} onClick={() => toggleSection('atencion')}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Headphones size={18} />
                 <span>Atención</span>
@@ -100,7 +121,7 @@ export const MainLayout: React.FC = () => {
 
           {/* INTELIGENCIA NLP */}
           <div>
-            <div style={parentItemStyle(false)} onClick={() => toggleSection('nlp')}>
+            <div style={parentItemStyle(location.pathname.startsWith('/nlp'))} onClick={() => toggleSection('nlp')}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Brain size={18} />
                 <span>Inteligencia NLP</span>
@@ -109,17 +130,25 @@ export const MainLayout: React.FC = () => {
             </div>
             {openSections.nlp && (
               <div style={subMenuContainerStyle}>
-                <span style={subItemStyle(false)}>Analizar comentario</span>
-                <span style={subItemStyle(false)}>Palabras frecuentes</span>
-                <span style={subItemStyle(false)}>Categorías</span>
-                <span style={subItemStyle(false)}>Clasificación</span>
+                <Link to="/nlp?tab=analizar" style={subItemStyle(isActive('/nlp') || isActive('/nlp?tab=analizar'))}>
+                  Analizar comentario
+                </Link>
+                <Link to="/nlp?tab=palabras" style={subItemStyle(isActive('/nlp?tab=palabras'))}>
+                  Palabras frecuentes
+                </Link>
+                <Link to="/nlp?tab=categorias" style={subItemStyle(isActive('/nlp?tab=categorias'))}>
+                  Categorías
+                </Link>
+                <Link to="/nlp?tab=clasificacion" style={subItemStyle(isActive('/nlp?tab=clasificacion'))}>
+                  Clasificación
+                </Link>
               </div>
             )}
           </div>
 
           {/* SCIENTIFIC DATA */}
           <div>
-            <div style={parentItemStyle(false)} onClick={() => toggleSection('scipy')}>
+            <div style={parentItemStyle(location.pathname.startsWith('/metricas'))} onClick={() => toggleSection('scipy')}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Calculator size={18} />
                 <span>Scientific Data</span>

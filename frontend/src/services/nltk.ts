@@ -1,17 +1,36 @@
 import api from './api';
-import type { KPIs, TopPalabra } from '../types';
 
-export const getDashboardKPIs = async (): Promise<KPIs> => {
-  const response = await api.get('/dashboard/resumen');
-  return response.data.kpis;
-};
+// Tipos para el módulo NLP
+export interface ResultadoNLP {
+  comentario_id: number;
+  cantidad_palabras: number;
+  palabras_limpias: string[];
+  palabras_frecuentes: { palabra: string; frecuencia: number }[];
+  categoria_detectada: string;
+  confianza: number;
+}
 
-export const getTopPalabras = async (limit = 10): Promise<TopPalabra[]> => {
-  const response = await api.get(`/dashboard/top-palabras?limit=${limit}`);
-  return response.data.data;
-};
+export interface RespuestaProcesamiento {
+  status: string;
+  categoria: string;
+  confianza: number;
+  data: ResultadoNLP[];
+}
 
-export const procesarComentarioNLP = async (id: number) => {
+// 1. Enviar un comentario a procesar individualmente con NLTK
+export const procesarComentarioNLP = async (id: number): Promise<RespuestaProcesamiento> => {
   const response = await api.post(`/nlp/procesar/${id}`);
+  return response.data;
+};
+
+// 2. Obtener lista de palabras más frecuentes
+export const getPalabrasFrecuentes = async (limit = 10) => {
+  const response = await api.get(`/nlp/palabras-frecuentes?limit=${limit}`);
+  return response.data;
+};
+
+// 3. Obtener distribución por categorías de NLTK
+export const getCategoriasNLP = async () => {
+  const response = await api.get('/nlp/categorias');
   return response.data;
 };

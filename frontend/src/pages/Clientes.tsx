@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ListaClientes } from '../components/clientes/ListaClientes';
 import { NuevoCliente } from '../components/clientes/NuevoCliente';
 import { HistorialClientes } from '../components/clientes/HistorialClientes';
 
 export const Clientes: React.FC = () => {
-  const [tab, setTab] = useState<'lista' | 'nuevo' | 'historial'>('lista');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Lee el parámetro 'tab' de la URL (?tab=nuevo, ?tab=historial, etc.)
+  // Si no está definido, toma 'lista' por defecto
+  const tab = searchParams.get('tab') || 'lista';
+
+  // Cambia la pestaña actualizando la query string en la URL
+  const setTab = (newTab: 'lista' | 'nuevo' | 'historial') => {
+    setSearchParams({ tab: newTab });
+  };
 
   return (
     <div>
