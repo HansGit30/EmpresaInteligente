@@ -5,7 +5,6 @@ interface PalabraFrecuencia {
   cantidad: number;
 }
 
-// URL base de Render asignada directamente para evitar fallos de conexión local
 const API_URL = import.meta.env.VITE_API_URL || 'https://backend-empresa-inteligente.onrender.com';
 
 export const PalabrasFrecuentes: React.FC = () => {
@@ -14,35 +13,13 @@ export const PalabrasFrecuentes: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Apunta al endpoint correcto de FastAPI registrado en Render
     fetch(`${API_URL}/nlp/palabras-frecuentes`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
       })
-      .then((response) => {
-        // Normaliza si la respuesta viene directa en un array o envuelta en un objeto
-        const data = Array.isArray(response)
-          ? response
-          : (response.palabras || response.data || []);
-
-        if (!Array.isArray(data) || data.length === 0) {
-          setPalabras([]);
-          return;
-        }
-
-        // Mapea la estructura según la respuesta recibida (objetos o tuplas/arrays [palabra, cantidad])
-        const resultado: PalabraFrecuencia[] = data.map((item: any) => {
-          if (typeof item === 'object' && !Array.isArray(item)) {
-            return {
-              palabra: item.palabra || item.word || item.texto || '',
-              cantidad: item.cantidad || item.frecuencia || item.count || 0,
-            };
-          }
-          return { palabra: String(item[0] || ''), cantidad: Number(item[1] || 0) };
-        });
-
-        setPalabras(resultado);
+      .then((data: PalabraFrecuencia[]) => {
+        setPalabras(Array.isArray(data) ? data : []);
       })
       .catch((err) => {
         console.error('Error al procesar palabras:', err);
@@ -62,7 +39,9 @@ export const PalabrasFrecuentes: React.FC = () => {
       </p>
 
       {palabras.length === 0 ? (
-        <p style={{ color: '#667085', fontSize: '14px' }}>No se encontraron palabras para procesar en los comentarios.</p>
+        <div style={{ padding: '16px', backgroundColor: '#fffaeb', border: '1px solid #fedf89', borderRadius: '8px', color: '#b54708', fontSize: '14px' }}>
+          No hay palabras analizadas aún. Procesa algunos comentarios primero mediante la opción <strong>Analizar comentario</strong> para poblar la tabla.
+        </div>
       ) : (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
           {palabras.map((item, index) => (
