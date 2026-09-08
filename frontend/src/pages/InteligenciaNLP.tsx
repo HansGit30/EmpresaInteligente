@@ -5,6 +5,8 @@ import { PalabrasFrecuentes } from '../components/nlp/PalabrasFrecuentes';
 import { Categorias } from '../components/nlp/Categorias';
 import { Clasificacion } from '../components/nlp/Clasificacion';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 export const InteligenciaNLP: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'analizar';
@@ -16,10 +18,15 @@ export const InteligenciaNLP: React.FC = () => {
   };
 
   useEffect(() => {
-    // Usamos la ruta existente /comentarios
-    fetch('http://localhost:8000/comentarios')
+    // Usamos la variable de entorno para consumir la API
+    fetch(`${API_URL}/comentarios/`)
       .then((res) => res.json())
-      .then((data) => {
+      .then((response) => {
+        // Soporta respuesta en array directo o envuelta en un objeto
+        const data = Array.isArray(response) 
+          ? response 
+          : (response.data || response.comentarios || []);
+
         if (Array.isArray(data)) {
           const total = data.length;
           setTotalComentarios(total);
