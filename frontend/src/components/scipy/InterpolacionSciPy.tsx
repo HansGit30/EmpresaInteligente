@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 export const InterpolacionSciPy: React.FC = () => {
   const [target, setTarget] = useState<number>(2.5);
   const [resultado, setResultado] = useState<number | null>(null);
 
   const calcular = () => {
-    fetch(`http://localhost:8000/scipy/interpolacion?x_target=${target}`)
+    fetch(`${API_URL}/scipy/interpolacion?x_target=${target}`)
       .then((res) => res.json())
       .then((data) => setResultado(data.valor_interpolado));
   };

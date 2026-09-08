@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 export const OptimizacionSciPy: React.FC = () => {
   const [umbral, setUmbral] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch('http://localhost:8000/scipy/optimizacion')
+    fetch(`${API_URL}/scipy/optimizacion`)
       .then((res) => res.json())
       .then((data) => setUmbral(data.umbral_optimo_calculado));
   }, []);

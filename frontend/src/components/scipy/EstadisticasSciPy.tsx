@@ -13,12 +13,14 @@ interface MetricasSciPy {
   total_muestras: number;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 export const EstadisticasSciPy: React.FC = () => {
   const [metricas, setMetricas] = useState<MetricasSciPy | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/scipy/estadisticas')
+    fetch(`${API_URL}/scipy/estadisticas`)
       .then((res) => res.json())
       .then((json) => {
         if (json.status === 'ok' && json.data) {

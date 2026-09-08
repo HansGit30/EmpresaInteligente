@@ -5,6 +5,8 @@ interface PalabraFrecuencia {
   cantidad: number;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 export const PalabrasFrecuentes: React.FC = () => {
   const [palabras, setPalabras] = useState<PalabraFrecuencia[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -17,7 +19,7 @@ export const PalabrasFrecuentes: React.FC = () => {
   ]);
 
   useEffect(() => {
-    fetch('http://localhost:8000/comentarios/')
+    fetch(`${API_URL}/comentarios/`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {

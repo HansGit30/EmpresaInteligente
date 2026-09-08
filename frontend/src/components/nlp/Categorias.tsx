@@ -7,6 +7,8 @@ interface Categoria {
   activo?: boolean;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 export const Categorias: React.FC = () => {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -15,7 +17,7 @@ export const Categorias: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     // Agregamos la barra diagonal / al final para evitar redirecciones 307
-    fetch('http://localhost:8000/categorias/')
+    fetch(`${API_URL}/categorias/`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Error en la respuesta: ${res.statusText}`);
