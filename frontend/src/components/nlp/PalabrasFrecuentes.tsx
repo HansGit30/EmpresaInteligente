@@ -5,68 +5,48 @@ interface PalabraFrecuencia {
   cantidad: number;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// URL base de Render asignada directamente para evitar fallos de conexión local
+const API_URL = import.meta.env.VITE_API_URL || 'https://backend-empresa-inteligente.onrender.com';
 
 export const PalabrasFrecuentes: React.FC = () => {
   const [palabras, setPalabras] = useState<PalabraFrecuencia[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Lista de palabras vacías (stopwords) a ignorar
-  const stopWords = new Set([
-    'de', 'la', 'que', 'el', 'en', 'y', 'a', 'los', 'del', 'se',
-    'por', 'un', 'para', 'con', 'no', 'una', 'su', 'al', 'lo', 'como',
-    'mas', 'pero', 'sus', 'le', 'ya', 'o', 'este', 'otra', 'vez'
-  ]);
-
   useEffect(() => {
-    fetch(`${API_URL}/comentarios/`)
+    // Apunta al endpoint correcto de FastAPI registrado en Render
+    fetch(`${API_URL}/nlp/palabras-frecuentes`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
       })
       .then((response) => {
-        // Normaliza la respuesta si viene en array directo o dentro de una propiedad
-        const listaComentarios = Array.isArray(response)
+        // Normaliza si la respuesta viene directa en un array o envuelta en un objeto
+        const data = Array.isArray(response)
           ? response
-          : (response.data || response.comentarios || response.results || []);
+          : (response.palabras || response.data || []);
 
-        if (!Array.isArray(listaComentarios) || listaComentarios.length === 0) {
+        if (!Array.isArray(data) || data.length === 0) {
           setPalabras([]);
           return;
         }
 
-        const conteo: Record<string, number> = {};
-
-        listaComentarios.forEach((item: any) => {
-          // Evalúa múltiples nombres de propiedades comunes para el texto
-          const texto = item.comentario || item.contenido || item.texto || item.mensaje || '';
-
-          const textoLimpio = texto
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .replace(/[^\w\s]/g, '');
-
-          const palabrasTexto = textoLimpio.split(/\s+/);
-
-          palabrasTexto.forEach((palabra: string) => {
-            if (palabra.length > 2 && !stopWords.has(palabra)) {
-              conteo[palabra] = (conteo[palabra] || 0) + 1;
-            }
-          });
+        // Mapea la estructura según la respuesta recibida (objetos o tuplas/arrays [palabra, cantidad])
+        const resultado: PalabraFrecuencia[] = data.map((item: any) => {
+          if (typeof item === 'object' && !Array.isArray(item)) {
+            return {
+              palabra: item.palabra || item.word || item.texto || '',
+              cantidad: item.cantidad || item.frecuencia || item.count || 0,
+            };
+          }
+          return { palabra: String(item[0] || ''), cantidad: Number(item[1] || 0) };
         });
-
-        // Convertir y ordenar por frecuencia descendente
-        const resultado = Object.entries(conteo)
-          .map(([palabra, cantidad]) => ({ palabra, cantidad }))
-          .sort((a, b) => b.cantidad - a.cantidad);
 
         setPalabras(resultado);
       })
       .catch((err) => {
         console.error('Error al procesar palabras:', err);
-        setError('No se pudieron obtener o procesar los comentarios de la API.');
+        setError('No se pudieron obtener las palabras frecuentes de la API.');
       })
       .finally(() => setLoading(false));
   }, []);
