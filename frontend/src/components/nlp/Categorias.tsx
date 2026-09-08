@@ -7,7 +7,7 @@ interface Categoria {
   activo?: boolean;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://backend-empresa-inteligente.onrender.com';
 
 export const Categorias: React.FC = () => {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -24,16 +24,11 @@ export const Categorias: React.FC = () => {
         return res.json();
       })
       .then((response) => {
-        // Normaliza si la API responde con un array directo o envuelto en data/categorias
         const lista = Array.isArray(response)
           ? response
           : (response.data || response.categorias || response.results || []);
 
-        if (Array.isArray(lista)) {
-          setCategorias(lista);
-        } else {
-          setCategorias([]);
-        }
+        setCategorias(Array.isArray(lista) ? lista : []);
       })
       .catch((err) => {
         console.error('Error al obtener categorías:', err);
@@ -43,19 +38,11 @@ export const Categorias: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div style={{ padding: '24px', color: '#667085', fontSize: '14px' }}>
-        Cargando categorías...
-      </div>
-    );
+    return <div style={{ padding: '24px', color: '#667085', fontSize: '14px' }}>Cargando categorías...</div>;
   }
 
   if (error) {
-    return (
-      <div style={{ padding: '24px', color: '#f04438', fontSize: '14px' }}>
-        {error}
-      </div>
-    );
+    return <div style={{ padding: '24px', color: '#f04438', fontSize: '14px' }}>{error}</div>;
   }
 
   return (
@@ -86,7 +73,6 @@ export const Categorias: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                transition: 'all 0.2s ease-in-out',
               }}
             >
               <div>
