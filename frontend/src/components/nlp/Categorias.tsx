@@ -16,7 +16,6 @@ export const Categorias: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    // Agregamos la barra diagonal / al final para evitar redirecciones 307
     fetch(`${API_URL}/categorias/`)
       .then((res) => {
         if (!res.ok) {
@@ -24,9 +23,14 @@ export const Categorias: React.FC = () => {
         }
         return res.json();
       })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setCategorias(data);
+      .then((response) => {
+        // Normaliza si la API responde con un array directo o envuelto en data/categorias
+        const lista = Array.isArray(response)
+          ? response
+          : (response.data || response.categorias || response.results || []);
+
+        if (Array.isArray(lista)) {
+          setCategorias(lista);
         } else {
           setCategorias([]);
         }
@@ -70,9 +74,9 @@ export const Categorias: React.FC = () => {
             gap: '20px',
           }}
         >
-          {categorias.map((cat) => (
+          {categorias.map((cat, index) => (
             <div
-              key={cat.id}
+              key={cat.id || index}
               style={{
                 backgroundColor: '#ffffff',
                 borderRadius: '16px',
@@ -86,7 +90,6 @@ export const Categorias: React.FC = () => {
               }}
             >
               <div>
-                {/* Cabecera de la Tarjeta */}
                 <div
                   style={{
                     display: 'flex',
@@ -105,7 +108,7 @@ export const Categorias: React.FC = () => {
                       fontWeight: 600,
                     }}
                   >
-                    ID #{cat.id}
+                    ID #{cat.id ?? index + 1}
                   </span>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -129,7 +132,6 @@ export const Categorias: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Título y Descripción */}
                 <h4
                   style={{
                     margin: '0 0 8px 0',
