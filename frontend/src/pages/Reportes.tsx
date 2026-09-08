@@ -1,8 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ReporteNLP } from '../components/reportes/ReporteNLP';
 
 export const Reportes: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'nlp' | 'atencion' | 'estadisticas'>('nlp');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Determinar la pestaña activa basándose en la ruta actual de la URL
+  const getActiveTab = () => {
+    if (location.pathname.includes('/reportes/atencion')) return 'atencion';
+    if (location.pathname.includes('/reportes/estadisticas')) return 'estadisticas';
+    return 'nlp';
+  };
+
+  const activeTab = getActiveTab();
+
+  const handleTabChange = (tab: 'nlp' | 'atencion' | 'estadisticas') => {
+    navigate(`/reportes/${tab}`);
+  };
 
   return (
     <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', backgroundColor: '#fcfcfd', minHeight: '100vh' }}>
@@ -13,10 +28,10 @@ export const Reportes: React.FC = () => {
         </p>
       </div>
 
-      {/* Pestañas de navegación interna */}
+      {/* Pestañas de navegación interna sincronizadas con la URL */}
       <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #eaecf0', paddingBottom: '12px' }}>
         <button
-          onClick={() => setActiveTab('nlp')}
+          onClick={() => handleTabChange('nlp')}
           style={{
             padding: '8px 16px',
             borderRadius: '8px',
@@ -31,7 +46,7 @@ export const Reportes: React.FC = () => {
           Reporte NLP
         </button>
         <button
-          onClick={() => setActiveTab('atencion')}
+          onClick={() => handleTabChange('atencion')}
           style={{
             padding: '8px 16px',
             borderRadius: '8px',
@@ -46,7 +61,7 @@ export const Reportes: React.FC = () => {
           Reporte Atención
         </button>
         <button
-          onClick={() => setActiveTab('estadisticas')}
+          onClick={() => handleTabChange('estadisticas')}
           style={{
             padding: '8px 16px',
             borderRadius: '8px',
@@ -62,7 +77,7 @@ export const Reportes: React.FC = () => {
         </button>
       </div>
 
-      {/* Renderizado condicional según la pestaña seleccionada */}
+      {/* Contenido condicional sincronizado con la ruta */}
       <div style={{ marginTop: '4px' }}>
         {activeTab === 'nlp' && <ReporteNLP />}
         
