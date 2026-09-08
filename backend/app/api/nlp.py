@@ -1,9 +1,38 @@
 from collections import Counter
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
+from pydantic import BaseModel
 from app.database.connection import supabase
 from app.services.nltk_service import analizar_comentario
 
 router = APIRouter(prefix="/nlp", tags=["Procesamiento NLP"])
+
+class TextoRequest(BaseModel):
+    texto: str
+
+
+# --- NUEVO ENDPOINT PARA PROCESAR TEXTO DIRECTAMENTE ---
+@router.post("/procesar-texto")
+def procesar_texto_directo(payload: TextoRequest):
+    try:
+        texto = payload.texto
+        if not texto.strip():
+            raise HTTPException(status_code=400, detail="El texto es obligatorio")
+        
+        # Procesar con NLTK
+        resultado = analizar_comentario(texto)
+        
+        return {
+            "status": "ok",
+            "sentimiento": resultado.get("sentimiento", "Neutro"),
+            "categoria": resultado.get("categoria", "General"),
+            "confianza": resultado.get("confianza", 0.85),
+            "cantidad_palabras": int(resultado.get("cantidad_palabras", 0)),
+            "palabras_limpias": [str(p) for p in resultado.get("palabras_limpias", [])]
+        }
+    except Exception as e:
+        print("ERROR NLP TEXTO:", str(e))
+        raise HTTPException(status_code=500, detail=f"Error en procesamiento NLP: {str(e)}")
+
 
 @router.post("/procesar/{comentario_id}")
 def procesar_comentario_endpoint(comentario_id: int):
