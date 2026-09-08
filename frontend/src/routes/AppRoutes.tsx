@@ -6,6 +6,7 @@ import MetricasPage from '../pages/CientificData';
 import ClientesPage from '../pages/Clientes';
 import { Comentarios } from '../pages/Comentarios';
 import { InteligenciaNLP } from '../pages/InteligenciaNLP';
+import { Reportes } from '../pages/Reportes';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -15,8 +16,13 @@ export const AppRoutes: React.FC = () => {
         <Route path="clientes" element={<ClientesPage />} />
         <Route path="metricas" element={<MetricasPage />} />
         <Route path="comentarios" element={<Comentarios />} />
-        {/* Nueva ruta para Inteligencia NLP */}
         <Route path="nlp" element={<InteligenciaNLP />} />
+        
+        {/* Rutas para Reportes y sus pestañas */}
+        <Route path="reportes" element={<Reportes />} />
+        <Route path="reportes/atencion" element={<Reportes />} />
+        <Route path="reportes/nlp" element={<Reportes />} />
+        <Route path="reportes/estadisticas" element={<Reportes />} />
       </Route>
     </Routes>
   );
