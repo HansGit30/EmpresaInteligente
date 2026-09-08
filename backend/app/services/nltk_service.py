@@ -20,12 +20,12 @@ except LookupError:
 def clasificar_texto(palabras_limpias: list[str]) -> tuple[str, float]:
     """Determina la categoría estimada según términos clave y su confianza."""
     
-    # Diccionario de palabras clave por categoría
+    # Diccionario de palabras clave ampliado (incluyendo variantes sin tilde)
     palabras_clave = {
-        "FELICITACION": ["excelente", "rápida", "bueno", "excelente", "buena", "genial", "satisfecho", "gracias"],
-        "RECLAMO": ["retraso", "demora", "problema", "malo", "pésimo", "falla", "error", "queja"],
-        "SOPORTE": ["ayuda", "sistema", "configuración", "técnico", "clave", "acceso", "pantalla"],
-        "CONSULTA": ["precio", "costo", "información", "horario", "ubicación", "dónde", "cuándo"]
+        "FELICITACION": ["excelente", "rápida", "rapida", "bueno", "buena", "genial", "satisfecho", "gracias", "felicito", "perfecto"],
+        "RECLAMO": ["retraso", "demora", "problema", "malo", "pésimo", "pesimo", "falla", "error", "queja", "terrible", "horrible"],
+        "SOPORTE": ["ayuda", "sistema", "configuración", "tecnico", "técnico", "clave", "acceso", "pantalla", "servicio"],
+        "CONSULTA": ["precio", "costo", "información", "informacion", "horario", "ubicación", "ubicacion", "dónde", "donde", "cuándo", "cuando"]
     }
 
     macheos = {cat: 0 for cat in palabras_clave}
@@ -35,11 +35,16 @@ def clasificar_texto(palabras_limpias: list[str]) -> tuple[str, float]:
             if palabra in terminos:
                 macheos[categoria] += 1
 
-    categoria_detectada = max(macheos, key=macheos.get)
     total_coincidencias = sum(macheos.values())
 
-    # Si no hubo ninguna palabra clave detectada
+    # Si no hubo ninguna palabra clave detectada por coincidencia directa
     if total_coincidencias == 0:
+        return "OTROS", 0.5000
+
+    categoria_detectada = max(macheos, key=macheos.get)
+    
+    # Si la categoría ganadora tiene 0 aciertos, retorna OTROS
+    if macheos[categoria_detectada] == 0:
         return "OTROS", 0.5000
 
     # Calcula la confianza basada en el porcentaje de coincidencia de la categoría ganadora
