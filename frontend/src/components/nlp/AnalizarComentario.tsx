@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 
 interface ResultadoNLP {
-  comentario_id?: number;
   sentimiento?: string;
-  score?: number;
   categoria?: string;
   confianza?: number;
+  cantidad_palabras?: number;
   palabras_limpias?: string[];
   mensaje?: string;
 }
@@ -27,30 +26,12 @@ export const AnalizarComentario: React.FC = () => {
     setResultado(null);
 
     try {
-      // 1. Opcional: Si tu backend requiere registrar primero el comentario en la tabla 'comentarios'
-      const resComentario = await fetch(`${API_URL}/comentarios/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contenido: comentario, cliente_id: 1, calificacion: 5 }), // Ajusta los campos requeridos por tu tabla
-      });
-
-      if (!resComentario.ok) {
-        throw new Error('No se pudo registrar el comentario previo.');
-      }
-
-      const comentarioCreado = await resComentario.json();
-      const comentarioId = comentarioCreado.id || comentarioCreado.data?.id;
-
-      if (!comentarioId) {
-        throw new Error('No se obtuvo el ID del comentario creado.');
-      }
-
-      // 2. Ejecutar el procesamiento NLP enviando el ID a la ruta existente en tu FastAPI
-      const response = await fetch(`${API_URL}/nlp/procesar/${comentarioId}`, {
+      const response = await fetch(`${API_URL}/nlp/procesar-texto`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ texto: comentario }),
       });
 
       if (!response.ok) {
@@ -120,7 +101,13 @@ export const AnalizarComentario: React.FC = () => {
       {resultado && (
         <div style={{ marginTop: '24px', padding: '16px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #eaecf0' }}>
           <h4 style={{ margin: '0 0 12px 0', color: '#101828' }}>Resultado del Análisis</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+            <div>
+              <span style={{ fontSize: '12px', color: '#667085' }}>Sentimiento:</span>
+              <p style={{ margin: '4px 0 0 0', fontWeight: 600, color: '#101828' }}>
+                {resultado.sentimiento || 'N/A'}
+              </p>
+            </div>
             <div>
               <span style={{ fontSize: '12px', color: '#667085' }}>Categoría:</span>
               <p style={{ margin: '4px 0 0 0', fontWeight: 600, color: '#101828' }}>
