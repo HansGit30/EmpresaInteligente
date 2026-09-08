@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Card } from '../ui/Card';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+
 export const NuevoCliente: React.FC = () => {
   const [nombre, setNombre] = useState('');
   const [empresa, setEmpresa] = useState('');
@@ -13,7 +15,7 @@ export const NuevoCliente: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/clientes', {
+      const response = await fetch(`${API_URL}/api/clientes/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

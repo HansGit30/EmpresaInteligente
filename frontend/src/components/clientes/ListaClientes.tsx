@@ -12,6 +12,8 @@ interface Cliente {
   created_at: string;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+
 export const ListaClientes: React.FC = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +21,7 @@ export const ListaClientes: React.FC = () => {
   useEffect(() => {
     const fetchClientes = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/clientes');
+        const response = await fetch(`${API_URL}/api/clientes`);
         if (!response.ok) {
           throw new Error('Error al obtener la lista de clientes');
         }

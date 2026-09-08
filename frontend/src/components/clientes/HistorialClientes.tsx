@@ -8,6 +8,8 @@ interface ClienteHistorial {
   created_at: string;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+
 export const HistorialClientes: React.FC = () => {
   const [historial, setHistorial] = useState<ClienteHistorial[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +17,7 @@ export const HistorialClientes: React.FC = () => {
   useEffect(() => {
     const fetchHistorial = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/clientes/historial');
+        const response = await fetch(`${API_URL}/api/clientes/historial`);
         if (!response.ok) throw new Error('Error al obtener el historial');
         const data = await response.json();
         setHistorial(data);
